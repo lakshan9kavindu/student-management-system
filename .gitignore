@@ -1,0 +1,14 @@
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+
+# Backend
+backend/target/
+backend/*.jar
+backend/src/main/resources/application-dev.properties
+
+# IDEs
+.idea/
+.vscode/
+*.swp
