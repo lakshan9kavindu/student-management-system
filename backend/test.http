@@ -1,0 +1,2 @@
+### 1. Get All Students
+GET http://localhost:8080/api/students
