@@ -1,6 +1,7 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 
 @Entity
@@ -17,8 +18,10 @@ public class Result {
     @Column(nullable = false)
     private BigDecimal marks;
 
+    // This annotation hides the internal Hibernate proxy data when converting to JSON
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Student student;
 
     // Getters and Setters

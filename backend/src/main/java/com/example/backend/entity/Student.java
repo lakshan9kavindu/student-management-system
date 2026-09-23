@@ -1,6 +1,7 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "students")
@@ -13,7 +14,9 @@ public class Student {
     @Column(name = "index_number", unique = true, nullable = false)
     private String indexNumber;
 
+    // This annotation allows the password to be saved, but prevents it from being returned in API responses
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(nullable = false)
