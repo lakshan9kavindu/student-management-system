@@ -1,0 +1,65 @@
+### Register student
+POST http://localhost:8080/api/students
+Content-Type: application/json
+
+{
+  "indexNumber": "100002W",
+  "password": "student123",
+  "name": "Test Student",
+  "email": "test@student.com"
+}
+
+### Student login
+POST http://localhost:8080/api/auth/student/login
+Content-Type: application/json
+
+{
+  "email": "test@student.com",
+  "password": "student123"
+}
+
+### Student results
+GET http://localhost:8080/api/results/student/1
+
+Authorization: Bearer YOUR_STUDENT_TOKEN
+
+### Delete student profile
+DELETE http://localhost:8080/api/students/1
+Authorization: Bearer YOUR_STUDENT_TOKEN
+
+### Admin login
+POST http://localhost:8080/api/auth/admin/login
+Content-Type: application/json
+
+{
+  "email": "admin@system.com",
+  "password": "student123"
+}
+
+### Get all students
+GET http://localhost:8080/api/students
+Authorization: Bearer YOUR_ADMIN_TOKEN
+
+### Add result
+POST http://localhost:8080/api/results/student/1
+Authorization: Bearer YOUR_ADMIN_TOKEN
+Content-Type: application/json
+
+{
+  "subject": "Mathematics",
+  "marks": 88.5
+}
+
+### Update result
+PUT http://localhost:8080/api/results/1
+Authorization: Bearer YOUR_ADMIN_TOKEN
+Content-Type: application/json
+
+{
+  "subject": "Mathematics",
+  "marks": 95.0
+}
+
+### Delete result
+DELETE http://localhost:8080/api/results/1
+Authorization: Bearer YOUR_ADMIN_TOKEN
