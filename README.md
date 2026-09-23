@@ -6,7 +6,7 @@ A full-stack student management system with a React frontend and a Spring Boot b
 
 - Frontend: React 19, Vite, and Oxlint
 - Backend: Spring Boot 4, Spring Web MVC, Spring Data JPA, and Spring Security
-- Database: MySQL or MariaDB
+- Database: MySQL
 - Passwords: BCrypt hashing
 
 ## Project Structure
@@ -22,7 +22,7 @@ student-management-system/
 
 - Java 21 or newer
 - Node.js and npm
-- MySQL or MariaDB
+- MySQL 
 - IntelliJ IDEA, VS Code, or another Java/React IDE
 
 ## Database Setup
