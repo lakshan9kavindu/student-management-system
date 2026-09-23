@@ -4,6 +4,7 @@ import com.example.backend.entity.Student;
 import com.example.backend.repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +15,11 @@ public class StudentService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public Student createStudent(Student student) {
-        // In a real application, you would hash the password here before saving
+        student.setPassword(passwordEncoder.encode(student.getPassword()));
         return studentRepository.save(student);
     }
 

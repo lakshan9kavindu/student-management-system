@@ -1,6 +1,7 @@
 package com.example.backend.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Entity
 @Table(name = "admin")
@@ -11,6 +12,7 @@ public class Admin {
     private Long id;
 
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(unique = true)

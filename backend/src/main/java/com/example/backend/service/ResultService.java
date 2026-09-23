@@ -31,7 +31,24 @@ public class ResultService {
         return resultRepository.findByStudentId(studentId);
     }
 
+    public Result updateResult(Long id, Result resultDetails) {
+        return resultRepository.findById(id).map(result -> {
+            result.setSubject(resultDetails.getSubject());
+            result.setMarks(resultDetails.getMarks());
+            if (resultDetails.getStudent() != null && resultDetails.getStudent().getId() != null) {
+                Student student = studentRepository.findById(resultDetails.getStudent().getId())
+                        .orElseThrow(() -> new RuntimeException("Student not found"));
+                result.setStudent(student);
+            }
+            return resultRepository.save(result);
+        }).orElseThrow(() -> new RuntimeException("Result not found with id " + id));
+    }
+
     public void deleteResult(Long id) {
         resultRepository.deleteById(id);
+    }
+
+    public List<Result> getAllResults() {
+        return resultRepository.findAll();
     }
 }

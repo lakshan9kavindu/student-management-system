@@ -7,6 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import org.springframework.security.core.Authentication;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/students")
@@ -22,19 +26,23 @@ public class StudentController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<Student>> getAllStudents() {
         return ResponseEntity.ok(studentService.getAllStudents());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudentById(@PathVariable Long id) {
+    public ResponseEntity<Student> getStudentById(@PathVariable Long id, Authentication authentication) {
+        if (!isOwner(id, authentication)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         return studentService.getStudentById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student studentDetails) {
+    public ResponseEntity<Student> updateStudent(@PathVariable Long id, @RequestBody Student studentDetails,
+                                                 Authentication authentication) {
+        if (!isOwner(id, authentication)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         try {
             return ResponseEntity.ok(studentService.updateStudent(id, studentDetails));
         } catch (RuntimeException e) {
@@ -43,8 +51,15 @@ public class StudentController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long id, Authentication authentication) {
+        if (!isOwner(id, authentication)) return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         studentService.deleteStudent(id);
         return ResponseEntity.noContent().build();
+    }
+
+    private boolean isOwner(Long studentId, Authentication authentication) {
+        if (authentication == null) return false;
+        var user = (com.example.backend.security.AuthenticatedUser) authentication.getPrincipal();
+        return user.role().equals("ADMIN") || (user.role().equals("STUDENT") && user.id().equals(studentId));
     }
 }
