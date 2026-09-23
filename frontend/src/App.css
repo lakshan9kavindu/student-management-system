@@ -212,3 +212,89 @@ input::placeholder { color: #a9b5ab; }
   .field-row { grid-template-columns: 1fr; gap: 1.2rem; }
   .panel-footer { align-items: flex-start; flex-direction: column; }
 }
+
+.dashboard-shell {
+  min-height: 100svh;
+  color: #1c2821;
+  background: #f4f7f1;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 1.5rem clamp(1.5rem, 6vw, 7rem);
+  border-bottom: 1px solid #dce5dc;
+  background: #f8faf5;
+}
+
+.dashboard-brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.brand-mark.small {
+  flex: 0 0 auto;
+  width: 2.5rem;
+  height: 2.5rem;
+  margin: 0;
+  color: #47734d;
+  border-color: #82a986;
+}
+
+.dashboard-brand .eyebrow { margin-bottom: 0.25rem; color: #729b76; }
+.dashboard-brand h1 { margin: 0; font: 400 1.6rem Georgia, serif; letter-spacing: -0.04em; }
+
+.logout-button,
+.refresh-button {
+  border: 0;
+  color: #345d3c;
+  background: transparent;
+  font: 700 0.75rem 'Trebuchet MS', sans-serif;
+  cursor: pointer;
+}
+
+.logout-button { padding: 0.65rem 0; border-bottom: 1px solid #98b39a; }
+.logout-button span { margin-left: 0.4rem; font-size: 1rem; }
+
+.dashboard-content { max-width: 1120px; margin: 0 auto; padding: clamp(2rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem); }
+.dashboard-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; margin-bottom: 2rem; }
+.dashboard-intro h2 { margin: 0; font: 400 clamp(2rem, 4vw, 3.5rem)/1 Georgia, serif; letter-spacing: -0.05em; }
+.refresh-button { padding: 0.7rem 1rem; border: 1px solid #b9cdbc; }
+.refresh-button:hover { background: #e8f0e6; }
+.dashboard-status { margin-bottom: 1.5rem; }
+
+.dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 0.8fr); gap: 1.5rem; align-items: start; }
+.dashboard-card { padding: clamp(1.25rem, 3vw, 2rem); border: 1px solid #dce5dc; background: #fff; }
+.card-heading { margin-bottom: 1.5rem; }
+.card-heading .eyebrow { margin-bottom: 0.5rem; color: #729b76; }
+.card-heading h3 { margin: 0; color: #1c2821; font: 400 1.55rem Georgia, serif; letter-spacing: -0.04em; }
+.card-heading h3 span { color: #729b76; font: 0.8rem 'Trebuchet MS', sans-serif; vertical-align: middle; }
+
+.student-list { display: grid; }
+.student-row { display: flex; align-items: center; gap: 0.8rem; padding: 1rem 0; border-top: 1px solid #e6ece5; }
+.student-avatar { display: grid; place-items: center; flex: 0 0 auto; width: 2.3rem; height: 2.3rem; color: #345d3c; background: #e8f0e6; font: 700 0.9rem Georgia, serif; }
+.student-details { display: grid; min-width: 0; gap: 0.25rem; flex: 1; }
+.student-details strong { color: #25362a; font: 400 1rem Georgia, serif; }
+.student-details span { overflow: hidden; color: #8a998e; font-size: 0.7rem; text-overflow: ellipsis; white-space: nowrap; }
+.delete-button { border: 0; color: #a34035; background: transparent; font: 700 0.7rem 'Trebuchet MS', sans-serif; cursor: pointer; }
+.delete-button:hover { text-decoration: underline; }
+.empty-state { color: #8a998e; font-size: 0.85rem; }
+
+.marks-form { display: grid; gap: 1.2rem; }
+select { width: 100%; box-sizing: border-box; padding: 0.9rem 0; border: 0; border-bottom: 1px solid #bdc9be; outline: 0; color: #1e2b22; background: transparent; font: 0.95rem Georgia, serif; }
+.marks-form .submit-button { margin-top: 0.6rem; }
+
+@media (max-width: 760px) {
+  .dashboard-header { align-items: flex-start; padding: 1.2rem 1.5rem; }
+  .dashboard-brand h1 { font-size: 1.25rem; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .dashboard-intro { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 420px) {
+  .student-row { align-items: flex-start; }
+  .student-details span { max-width: 12rem; }
+}

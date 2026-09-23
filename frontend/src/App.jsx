@@ -1,19 +1,83 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [mode, setMode] = useState('student-login')
+  const [mode, setMode] = useState(localStorage.getItem('userRole') === 'ADMIN' ? 'admin-dashboard' : 'student-login')
   const [form, setForm] = useState({ name: '', indexNumber: '', email: '', password: '' })
   const [status, setStatus] = useState({ type: '', message: '' })
   const [loading, setLoading] = useState(false)
+  const [students, setStudents] = useState([])
+  const [dashboardLoading, setDashboardLoading] = useState(false)
+  const [marksForm, setMarksForm] = useState({ studentId: '', subject: '', marks: '' })
 
   const isRegister = mode === 'student-register'
   const isAdmin = mode === 'admin-login'
+  const isDashboard = mode === 'admin-dashboard'
+
+  useEffect(() => {
+    if (isDashboard) loadStudents()
+  }, [isDashboard])
+
+  async function authorizedRequest(endpoint, options = {}) {
+    const token = localStorage.getItem('authToken')
+    const response = await fetch(endpoint, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...options.headers },
+    })
+    if (!response.ok) throw new Error((await response.text()) || 'Request could not be completed')
+    return response.status === 204 ? null : response.json()
+  }
+
+  async function loadStudents() {
+    setDashboardLoading(true)
+    try {
+      setStudents(await authorizedRequest('/api/students'))
+      setStatus({ type: '', message: '' })
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message })
+    } finally {
+      setDashboardLoading(false)
+    }
+  }
 
   function changeMode(nextMode) {
     setMode(nextMode)
     setForm({ name: '', indexNumber: '', email: '', password: '' })
     setStatus({ type: '', message: '' })
+  }
+
+  async function deleteStudent(student) {
+    if (!window.confirm(`Delete ${student.name}'s account? This also removes their results.`)) return
+    try {
+      await authorizedRequest(`/api/students/${student.id}`, { method: 'DELETE' })
+      setStudents(students.filter((item) => item.id !== student.id))
+      setStatus({ type: 'success', message: `${student.name}'s account was deleted.` })
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message })
+    }
+  }
+
+  async function addMarks(event) {
+    event.preventDefault()
+    try {
+      await authorizedRequest(`/api/results/student/${marksForm.studentId}`, {
+        method: 'POST',
+        body: JSON.stringify({ subject: marksForm.subject, marks: Number(marksForm.marks) }),
+      })
+      setMarksForm({ studentId: '', subject: '', marks: '' })
+      setStatus({ type: 'success', message: 'Marks added successfully.' })
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message })
+    }
+  }
+
+  function logout() {
+    localStorage.removeItem('authToken')
+    localStorage.removeItem('userRole')
+    localStorage.removeItem('userId')
+    setStudents([])
+    setMode('student-login')
+    setStatus({ type: 'success', message: 'You have been logged out.' })
   }
 
   function updateField(event) {
@@ -43,13 +107,52 @@ function App() {
         localStorage.setItem('authToken', data.token)
         localStorage.setItem('userRole', data.role)
         localStorage.setItem('userId', String(data.userId))
-        setStatus({ type: 'success', message: `${data.role.toLowerCase()} login successful.` })
+        if (data.role === 'ADMIN') {
+          setMode('admin-dashboard')
+        } else {
+          setStatus({ type: 'success', message: `${data.role.toLowerCase()} login successful.` })
+        }
       }
     } catch (error) {
       setStatus({ type: 'error', message: error.message })
     } finally {
       setLoading(false)
     }
+  }
+
+  if (isDashboard) {
+    return (
+      <main className="dashboard-shell">
+        <header className="dashboard-header">
+          <div className="dashboard-brand"><span className="brand-mark small">SM</span><div><p className="eyebrow">Student management system</p><h1>Admin workspace</h1></div></div>
+          <button className="logout-button" onClick={logout} type="button">Log out <span aria-hidden="true">↗</span></button>
+        </header>
+
+        <section className="dashboard-content">
+          <div className="dashboard-intro"><div><p className="eyebrow">Overview</p><h2>Keep student records moving.</h2></div><button className="refresh-button" onClick={loadStudents} type="button">↻ Refresh</button></div>
+          {status.message && <p className={`form-status dashboard-status ${status.type}`}>{status.message}</p>}
+
+          <div className="dashboard-grid">
+            <section className="dashboard-card students-card">
+              <div className="card-heading"><div><p className="eyebrow">Directory</p><h3>Student accounts <span>{students.length}</span></h3></div></div>
+              {dashboardLoading ? <p className="empty-state">Loading student records...</p> : students.length === 0 ? <p className="empty-state">No student accounts found.</p> : <div className="student-list">
+                {students.map((student) => <div className="student-row" key={student.id}><div className="student-avatar">{student.name?.charAt(0).toUpperCase()}</div><div className="student-details"><strong>{student.name}</strong><span>{student.indexNumber} · {student.email}</span></div><button className="delete-button" onClick={() => deleteStudent(student)} type="button" title={`Delete ${student.name}`}>Delete</button></div>)}
+              </div>}
+            </section>
+
+            <section className="dashboard-card marks-card">
+              <div className="card-heading"><p className="eyebrow">Results</p><h3>Add marks</h3></div>
+              <form onSubmit={addMarks} className="marks-form">
+                <label>Student<select value={marksForm.studentId} onChange={(event) => setMarksForm({ ...marksForm, studentId: event.target.value })} required><option value="">Choose a student</option>{students.map((student) => <option key={student.id} value={student.id}>{student.name} · {student.indexNumber}</option>)}</select></label>
+                <label>Subject<input value={marksForm.subject} onChange={(event) => setMarksForm({ ...marksForm, subject: event.target.value })} placeholder="Information Technology" required /></label>
+                <label>Marks<input type="number" min="0" max="100" step="0.01" value={marksForm.marks} onChange={(event) => setMarksForm({ ...marksForm, marks: event.target.value })} placeholder="85.50" required /></label>
+                <button className="submit-button" type="submit" disabled={!students.length}>Add marks <span aria-hidden="true">↗</span></button>
+              </form>
+            </section>
+          </div>
+        </section>
+      </main>
+    )
   }
 
   return (
