@@ -9,14 +9,19 @@ function App() {
   const [students, setStudents] = useState([])
   const [dashboardLoading, setDashboardLoading] = useState(false)
   const [marksForm, setMarksForm] = useState({ studentId: '', subject: '', marks: '' })
+  const [studentProfile, setStudentProfile] = useState(null)
+  const [studentResults, setStudentResults] = useState([])
+  const [profileForm, setProfileForm] = useState({ name: '', email: '' })
 
   const isRegister = mode === 'student-register'
   const isAdmin = mode === 'admin-login'
   const isDashboard = mode === 'admin-dashboard'
+  const isStudentDashboard = mode === 'student-dashboard'
 
   useEffect(() => {
     if (isDashboard) loadStudents()
-  }, [isDashboard])
+    if (isStudentDashboard) loadStudentDashboard()
+  }, [isDashboard, isStudentDashboard])
 
   async function authorizedRequest(endpoint, options = {}) {
     const token = localStorage.getItem('authToken')
@@ -32,6 +37,25 @@ function App() {
     setDashboardLoading(true)
     try {
       setStudents(await authorizedRequest('/api/students'))
+      setStatus({ type: '', message: '' })
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message })
+    } finally {
+      setDashboardLoading(false)
+    }
+  }
+
+  async function loadStudentDashboard() {
+    setDashboardLoading(true)
+    const studentId = localStorage.getItem('userId')
+    try {
+      const [profile, results] = await Promise.all([
+        authorizedRequest(`/api/students/${studentId}`),
+        authorizedRequest(`/api/results/student/${studentId}`),
+      ])
+      setStudentProfile(profile)
+      setProfileForm({ name: profile.name, email: profile.email || '' })
+      setStudentResults(results)
       setStatus({ type: '', message: '' })
     } catch (error) {
       setStatus({ type: 'error', message: error.message })
@@ -66,6 +90,30 @@ function App() {
       })
       setMarksForm({ studentId: '', subject: '', marks: '' })
       setStatus({ type: 'success', message: 'Marks added successfully.' })
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message })
+    }
+  }
+
+  async function updateProfile(event) {
+    event.preventDefault()
+    try {
+      const updatedProfile = await authorizedRequest(`/api/students/${studentProfile.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(profileForm),
+      })
+      setStudentProfile(updatedProfile)
+      setStatus({ type: 'success', message: 'Profile information updated.' })
+    } catch (error) {
+      setStatus({ type: 'error', message: error.message })
+    }
+  }
+
+  async function deleteOwnAccount() {
+    if (!window.confirm('Delete your account? This will also remove all your results.')) return
+    try {
+      await authorizedRequest(`/api/students/${localStorage.getItem('userId')}`, { method: 'DELETE' })
+      logout()
     } catch (error) {
       setStatus({ type: 'error', message: error.message })
     }
@@ -110,7 +158,7 @@ function App() {
         if (data.role === 'ADMIN') {
           setMode('admin-dashboard')
         } else {
-          setStatus({ type: 'success', message: `${data.role.toLowerCase()} login successful.` })
+          setMode('student-dashboard')
         }
       }
     } catch (error) {
@@ -150,6 +198,40 @@ function App() {
               </form>
             </section>
           </div>
+        </section>
+      </main>
+    )
+  }
+
+  if (isStudentDashboard) {
+    return (
+      <main className="dashboard-shell student-dashboard-shell">
+        <header className="dashboard-header">
+          <div className="dashboard-brand"><span className="brand-mark small">SM</span><div><p className="eyebrow">Student management system</p><h1>Student space</h1></div></div>
+          <button className="logout-button" onClick={logout} type="button">Log out <span aria-hidden="true">↗</span></button>
+        </header>
+
+        <section className="dashboard-content">
+          <div className="dashboard-intro"><div><p className="eyebrow">Your overview</p><h2>Welcome, {studentProfile?.name || 'student'}.</h2></div><button className="refresh-button" onClick={loadStudentDashboard} type="button">↻ Refresh</button></div>
+          {status.message && <p className={`form-status dashboard-status ${status.type}`}>{status.message}</p>}
+
+          {dashboardLoading ? <p className="empty-state">Loading your student space...</p> : <div className="student-dashboard-grid">
+            <section className="dashboard-card results-card">
+              <div className="card-heading"><p className="eyebrow">Academic record</p><h3>Your marks <span>{studentResults.length}</span></h3></div>
+              {studentResults.length === 0 ? <p className="empty-state">No results have been added yet.</p> : <div className="results-list">{studentResults.map((result) => <div className="result-row" key={result.id}><div><strong>{result.subject}</strong><span>Academic result</span></div><b>{result.marks}</b></div>)}</div>}
+            </section>
+
+            <section className="dashboard-card profile-card">
+              <div className="card-heading"><p className="eyebrow">Account</p><h3>Edit information</h3></div>
+              <form onSubmit={updateProfile} className="marks-form">
+                <label>Full name<input value={profileForm.name} onChange={(event) => setProfileForm({ ...profileForm, name: event.target.value })} required /></label>
+                <label>Email address<input type="email" value={profileForm.email} onChange={(event) => setProfileForm({ ...profileForm, email: event.target.value })} required /></label>
+                <p className="profile-readonly">Index number: <strong>{studentProfile?.indexNumber}</strong></p>
+                <button className="submit-button" type="submit">Save changes <span aria-hidden="true">↗</span></button>
+              </form>
+              <button className="danger-account-button" onClick={deleteOwnAccount} type="button">Delete my account</button>
+            </section>
+          </div>}
         </section>
       </main>
     )

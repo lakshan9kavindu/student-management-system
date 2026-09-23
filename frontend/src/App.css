@@ -287,10 +287,23 @@ input::placeholder { color: #a9b5ab; }
 select { width: 100%; box-sizing: border-box; padding: 0.9rem 0; border: 0; border-bottom: 1px solid #bdc9be; outline: 0; color: #1e2b22; background: transparent; font: 0.95rem Georgia, serif; }
 .marks-form .submit-button { margin-top: 0.6rem; }
 
+.student-dashboard-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.85fr); gap: 1.5rem; align-items: start; }
+.results-list { display: grid; }
+.result-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.15rem 0; border-top: 1px solid #e6ece5; }
+.result-row div { display: grid; gap: 0.25rem; }
+.result-row strong { color: #25362a; font: 400 1.05rem Georgia, serif; }
+.result-row span { color: #8a998e; font-size: 0.7rem; }
+.result-row b { min-width: 3.3rem; padding: 0.5rem; color: #345d3c; background: #e8f0e6; font: 400 1rem Georgia, serif; text-align: center; }
+.profile-readonly { margin: 0; color: #8a998e; font-size: 0.75rem; }
+.profile-readonly strong { color: #49644f; font-weight: 700; }
+.danger-account-button { margin-top: 2rem; padding: 0; border: 0; color: #a34035; background: transparent; font: 700 0.7rem 'Trebuchet MS', sans-serif; cursor: pointer; }
+.danger-account-button:hover { text-decoration: underline; }
+
 @media (max-width: 760px) {
   .dashboard-header { align-items: flex-start; padding: 1.2rem 1.5rem; }
   .dashboard-brand h1 { font-size: 1.25rem; }
   .dashboard-grid { grid-template-columns: 1fr; }
+  .student-dashboard-grid { grid-template-columns: 1fr; }
   .dashboard-intro { align-items: flex-start; flex-direction: column; }
 }
 
