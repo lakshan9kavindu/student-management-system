@@ -1,16 +1,36 @@
-# React + Vite
+# Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+React and Vite client for the Student Management System.
 
-Currently, two official plugins are available:
+## Start Development Server
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+From this directory:
 
-## React Compiler
+```powershell
+npm install
+npm run dev
+```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Open `http://localhost:3000`.
 
-## Expanding the Oxlint configuration
+The Vite development server proxies `/api` requests to `http://localhost:8080`, so the Spring Boot backend must be running separately.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## Available Commands
+
+```powershell
+npm run dev       # Start the development server
+npm run build     # Create a production build
+npm run lint      # Run Oxlint
+npm run preview   # Preview the production build
+```
+
+## Page Structure
+
+- `src/pages/LoginPage.jsx`: student login, student registration, and admin login
+- `src/pages/AdminDashboard.jsx`: student directory, account deletion, and marks entry
+- `src/pages/StudentDashboard.jsx`: personal marks, profile editing, account deletion, and logout
+- `src/components/DashboardLayout.jsx`: shared dashboard header and logout control
+- `src/components/StatusMessage.jsx`: shared success and error message component
+- `src/api.js`: authenticated requests and local session helpers
+
+The selected role and bearer token are stored in `localStorage` after login. The frontend sends the token as an `Authorization: Bearer` header for protected API requests.
