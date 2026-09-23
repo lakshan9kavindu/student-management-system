@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql_db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: stu_management
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+
+  # Spring Boot Backend
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql_db
+    environment:
+      # Change localhost to the container name for internal networking
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql_db:3306/stu_management?useSSL=false&serverTimezone=UTC
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
